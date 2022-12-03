@@ -1,52 +1,112 @@
-/* eslint-disable vue/no-v-model-argument */
 <template>
-    <div class="!w-[260px] bg-[#031634] a-the-sidebar-vertical max-h-screen h-full flex flex-col">
-        <div class="flex justify-between items-center pt-4 px-4">
-            <nuxt-link to="/">
-                <img src="/images/logo-3.png" width="150">
+    <div class="!w-[270px] h-screen bg-white flex flex-col p-3">
+        <div class="flex justify-between items-center">
+            <nuxt-link to="/" class="flex items-center gap-3">
+                <img src="https://inkythuatso.com/uploads/images/2021/12/logo-pornhub-inkythuatso-21-15-41-06.jpg" width="66">
+                <div class="font-medium text-second-900">
+                    Web Porn VuNgocTu
+                </div>
             </nuxt-link>
         </div>
         <a-menu
             :open-keys="openKeys"
             :default-selected-keys="activeKeys"
             :inline-collapsed="collapsed"
-            class="!mt-6 w-[260px] flex-grow overflow-y-auto custom-scroll overflow-x-hidden !p-4"
+            class="!mt-6 w-full flex-grow overflow-y-auto custom-scroll overflow-x-hidden !p-1"
             mode="inline"
             @click="handleClick"
             @openChange="handleOpenChange"
         >
-            <a-sub-menu v-for="sidebarItem in SIDEBAR_ITEMS" :key="sidebarItem.route">
-                <template slot="title">
-                    <i :class="sidebarItem.icon" />
-                    <span class="truncate">{{ sidebarItem.label }}</span>
-                </template>
-                <template v-for="sidebarItemChild in sidebarItem.childs">
-                    <a-menu-item v-if="sidebarItemChild.route" :key="sidebarItemChild.route">
-                        <span class="truncate">{{ sidebarItemChild.label }}</span>
+            <template v-for="menuItem in menuItems">
+                <a-menu-item v-if="!menuItem.childrens.length" :key="menuItem.key">
+                    <i :class="`${menuItem.classIcon}`" />
+                    <span class="ml-3"> {{ menuItem.label }} </span>
+                </a-menu-item>
+                <a-sub-menu v-if="menuItem.childrens.length > 0" :key="menuItem.key">
+                    <template #title>
+                        <i :class="`${menuItem.classIcon}`" />
+                        <span class="ml-3"> {{ menuItem.label }} </span>
+                    </template>
+                    <a-menu-item v-for="child in menuItem.childrens" :key="child.key">
+                        <i :class="`${child.classIcon}`" />
+                        <span class="ml-3"> {{ child.label }} </span>
                     </a-menu-item>
-                </template>
-            </a-sub-menu>
+                </a-sub-menu>
+            </template>
         </a-menu>
+
+        <div class="border-t border-prim-300 pt-3">
+            <div class="flex items-center gap-3">
+                <div class="border border-gray-100 rounded-md overflow-hidden">
+                    <img :src="authUser.avatar || '/images/default-avatar.png'" onerror="this.src='/images/default-avatar.png'" class="w-12 aspect-square object-cover">
+                </div>
+                <div>
+                    <nuxt-link to="/profile" class="font-medium text-gray-900 hover:underline">
+                        {{ authUser.firstName || '' }} {{ authUser.lastName || '' }}
+                    </nuxt-link>
+                </div>
+            </div>
+            <a-button
+                type="primary"
+                class="mt-3 w-full"
+                size="small"
+                @click="confirm"
+            >
+                <i class="fa-solid fa-right-from-bracket" />
+                Đăng xuất
+            </a-button>
+        </div>
     </div>
 </template>
 
 <script>
-    import SIDEBAR_ITEMS from '@/constants/sidebarItems';
-
     export default {
+        components: {
+        },
+
+        async fetch() {
+            await this.fetchData();
+        },
+
         data() {
             return {
-                SIDEBAR_ITEMS,
                 isOpen: true,
                 openKeys: [],
                 logoutVisible: false,
                 collapsed: false,
+                visible: false,
             };
         },
 
         computed: {
             activeKeys() {
+                // console.log(this.$route.path);
                 return [this.$route.path];
+            },
+
+            authUser() {
+                return this.$auth.user || {};
+            },
+            menuItems() {
+                return [{
+                    label: 'Dashboard',
+                    key: '/',
+                    permission: ['admin', 'teacher', 'user'],
+                    classIcon: 'isax isax-graph',
+                    childrens: [],
+                }, {
+                    label: 'Quản lý sách',
+                    key: '/profile',
+                    permission: ['admin', 'teacher', 'user'],
+                    classIcon: 'isax isax-user',
+                    childrens: [],
+                }, {
+                    label: 'Giỏ hàng',
+                    key: '/users',
+                    permission: ['admin'],
+                    classIcon: 'isax isax-people',
+                    childrens: [],
+                }];
             },
         },
 
@@ -55,6 +115,17 @@
         },
 
         methods: {
+            async fetchData() {
+                try {
+                    this.loading = true;
+                    // await this.$store.dispatch('notifications/fetchAll', this.$route.query);
+                } catch (error) {
+                    this.$handleError(error);
+                } finally {
+                    this.loading = false;
+                }
+            },
+
             handleClick({ key }) {
                 this.$router.push(key);
             },
@@ -67,53 +138,15 @@
                 this.collapsed = !this.collapsed;
                 localStorage.setItem(this.localStorage);
             },
+
+            handleHoverChange(visible) {
+                this.visible = visible;
+            },
+
+            async confirm() {
+                this.$refs.confirm.open();
+            },
+
         },
     };
 </script>
-
-<style lang="scss">
-    .a-the-sidebar-vertical:not(.a-menu--collapse) {
-        @apply w-[256px];
-        .ant-menu {
-            @apply bg-[#031634];
-        }
-        .ant-menu-inline {
-            @apply border-0;
-        }
-        .ant-menu-sub {
-            .ant-menu-item {
-                @apply pl-8 #{!important};
-            }
-        }
-        .ant-menu-submenu-arrow {
-            @apply text-right;
-        }
-        .ant-menu-item, .ant-menu-submenu-title {
-            height: auto !important;
-            @apply text-white flex items-center;
-            @apply m-0 px-4 my-2 rounded  #{!important};
-
-            >span {
-                @apply flex-grow;
-            }
-
-            i {
-                @apply text-lg w-4 mr-4 mb-1 #{!important};
-            }
-
-            .ant-menu-submenu-arrow {
-                @apply mr-0;
-                &::after, &::before {
-                    @apply bg-white #{!important};
-                }
-            }
-
-            &-selected {
-                @apply bg-[#2ea1ff];
-                &::after {
-                    @apply hidden;
-                }
-            }
-        }
-    }
-</style>

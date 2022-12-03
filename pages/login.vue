@@ -1,5 +1,9 @@
 <template>
     <div class="flex flex-col items-center">
+        <div slot="title" class="mt-4 mb-4 text-gray-80 text-xl font-medium text-prim-900 text-center">
+            Đăng nhập
+        </div>
+
         <a-alert
             v-if="error"
             class="!mt-3 w-full"
@@ -7,7 +11,28 @@
             type="warning"
             show-icon
         />
-        <LoginForm :loading="loading" class="!mt-3 min-w-[200px] max-w-md w-full" @submit="login" />
+        <LoginForm
+            ref="form"
+            :loading="loading"
+            class="!mt-3 min-w-[200px] max-w-md w-full"
+            @submit="login"
+        />
+        <div class="flex justify-between w-full my-4 mb-6">
+            <a-checkbox v-model="passwordMemory">
+                Ghi nhớ lần đăng nhập sau
+            </a-checkbox>
+            <nuxt-link to="/forgot-password">
+                Reset Password
+            </nuxt-link>
+        </div>
+        <a-button
+            :loading="loading"
+            type="primary"
+            class="w-full"
+            @click="$refs.form.submit()"
+        >
+            Đăng nhập
+        </a-button>
     </div>
 </template>
 
@@ -22,7 +47,9 @@
         },
 
         data() {
+            const userInfo = JSON.parse(window.localStorage.getItem('userInfo'));
             return {
+                passwordMemory: !!userInfo,
                 encryptor: null,
                 loading: false,
                 error: null,
@@ -42,31 +69,31 @@
         methods: {
             login(form) {
                 this.loading = true;
-                this.$auth.loginWith('local', {
-                    data: {
-                        ...form,
-                        password: this.encryptor(form.password),
-                    },
-                }).then(async () => {
-                    this.$router.push('/');
-                }).catch((error) => {
-                    this.$handleError(error, (_error) => {
-                        const errorData = _error?.response?.data;
-
-                        if (errorData?.code === 401) {
-                            this.error = 'Tên đăng nhập hoặc mật khẩu không chính xác';
-                            this.$forceUpdate();
-                        }
-                    });
-                }).finally(() => {
-                    this.loading = false;
+                this.$auth.loginWith('local', async () => {
+                    try {
+                        this.loading = true;
+                        await this.$auth.loginWith('local', { data: form });
+                        this.$router.push('/');
+                        this.$message.success('Đăng nhập thành công');
+                    } catch {
+                        this.$message.error('Sai email hoặc mật khẩu');
+                    } finally {
+                        this.loading = false;
+                    }
                 });
+            },
+
+            async getTokenLiveClass() {
+                await this.$store.dispatch('room/createUserLiveClass');
+            },
+            changeLocale({ key }) {
+                this.$i18n.setLocale(key);
             },
         },
 
         head() {
             return {
-                title: 'Đăng nhập | Nuxt Boilerplate',
+                title: 'Login | LMS',
             };
         },
     };

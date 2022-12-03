@@ -1,28 +1,74 @@
 <template>
-    <div class="flex justify-between bg-[#f8f8f8] min-h-screen">
+    <div class="flex justify-between bg-background min-h-screen">
         <div class="hidden md:block">
             <TheSidebar />
         </div>
-        <div class="flex-grow flex flex-col h-screen overflow-x-hidden">
-            <TheHeader />
-            <div class="flex-grow overflow-y-auto max-h-screen custom-scroll">
-                <nuxt class="bg-[#FAFBFF] shadow-light p-4 m-3 md:m-6 overflow-x-hidden" />
+        <div id="scrollBar" class="flex-grow flex flex-col h-screen overflow-x-hidden overflow-y-auto custom-scroll">
+            <TheHeader class="md:hidden sticky top-0 z-30" />
+            <div class="p-4 lg:p-6 flex-grow flex flex-col">
+                <Breadcrumb v-if="$route.path !== '/'" :links="breadcrumbs" />
+                <nuxt v-if="!$slots.default" class="mt-2 flex-grow overflow-hidden" />
+                <slot class="mt-2 flex-grow overflow-hidden" />
             </div>
-            <TheFooter />
         </div>
+        <UpdatePasswordModal ref="changePassword" />
     </div>
 </template>
 
 <script>
+    // import Scrollbar from 'smooth-scrollbar';
+    import { mapState } from 'vuex';
+    // import TheHeader from '@/components/layout/TheHeader.vue';
     import TheSidebar from '@/components/layout/TheSidebar.vue';
-    import TheHeader from '@/components/layout/TheHeader.vue';
-    import TheFooter from '@/components/layout/TheFooter.vue';
+    import Breadcrumb from '@/components/shared/Breadcrumb.vue';
 
     export default {
         components: {
-            TheSidebar,
             TheHeader,
-            TheFooter,
+            TheSidebar,
+            Breadcrumb,
+        },
+
+        data() {
+            return {
+                scrollListener: undefined,
+            };
+        },
+
+        computed: {
+            ...mapState('breadcrumbs', ['breadcrumbs']),
+        },
+
+        watch: {
+            '$route.query': {
+                handler() {
+                    const scroll = document.getElementById('scrollBar');
+                    scroll.scrollTop = 0;
+                },
+            },
+        },
+
+        async mounted() {
+            if (this.$auth.user.isFirstLogin) {
+                this.$refs.changePassword.open();
+            }
+
+            const ele = document.getElementById('scrollBar');
+
+            this.scrollListener = ele.addEventListener('scroll', () => {
+                const dropdowns = document.querySelectorAll('.ant-select-dropdown');
+
+                dropdowns.forEach((dropdown) => {
+                    dropdown.style.display = 'none';
+                });
+            }, true);
+
+            // Scrollbar.init(document.getElementById('scrollBar'), {
+            //     damping: 0.1,
+        },
+
+        beforeDestroy() {
+            window.removeEventListener('scroll', this.scrollListener);
         },
     };
 </script>

@@ -2,13 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
-    font-family: 'Be Vietnam Pro', sans-serif;
-    word-break: break-word !important;
-}
+@import './icons/isax/style.css';
+@import './icons/isax-bold/style.css';
 
+html {
+    scroll-behavior: smooth !important;
+}
 body {
-    @apply text-base text-gray-100 #{!important};
+    font-family: 'Be Vietnam Pro', sans-serif !important;
+    word-break: break-word !important;
+    @apply text-base text-gray-800 #{!important};
 }
 
 .app {
@@ -19,45 +22,58 @@ a {
     color: inherit !important;
 }
 
-.fade-enter-active, .fade-leave-active {
-    opacity: 1;
-    animation: acrossIn .15s ease-out both, opacity .15s;
-}
-
-.fade-enter, .fade-leave-active {
-    opacity: 0;
-    transition: opacity 0.15s linear;
-}
-
-@keyframes acrossIn {
-    0% {
-        transform: translate3d(-5%, 0, 0);
-    }
-    100% {
-        transform: translate3d(0, 0, 0);
-    }
-}
-
 .shadow-light {
     box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.1);
+} 
+
+h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold text-gray-900;
+}
+h1 {
+    @apply text-3xl;
+}
+h2 {
+    @apply text-2xl;
+}
+h3 {
+    @apply text-xl;
+}
+h4 {
+    @apply text-lg;
+}
+h5 {
+    @apply text-base;
+}
+h6 {
+    @apply text-sm;
+}
+strong {
+    @apply font-medium text-gray-900 #{!important};
 }
 
-.inject-html {
+.inject-content {
     table {
         td {
-            @apply border border-gray-20;
+            @apply border border-gray-800 #{!important};
         }
     }
 }
 
-// Full Calendar
-.fc {
-    .fc-toolbar {
-        &-title {
-            @apply text-prim-100 font-semibold uppercase text-xl #{!important};
-        }
-        button {
-            @apply bg-blue-100 border-blue-100 #{!important};
-        }
-    }
+/* scroll style */
+::-webkit-scrollbar-track
+{
+    border-radius: 10px;
+    background-color: transparent;
+}
+
+::-webkit-scrollbar
+{
+    width: 6px;
+    background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb
+{
+    border-radius: 10px;
+    background-color: #CCCECC;
 }

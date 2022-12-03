@@ -75,7 +75,14 @@ export default {
         '@nuxtjs/fontawesome',
         '@nuxtjs/tailwindcss',
         '@nuxtjs/google-analytics',
+        '@nuxtjs/google-fonts',
     ],
+
+    googleFonts: {
+        families: {
+            'Be+Vietnam+Pro': [300, 400, 500, 600],
+        },
+    },
 
     modules: [
         '@nuxtjs/axios',
@@ -126,9 +133,9 @@ export default {
         },
     },
 
-    router: {
-        middleware: ['auth'],
-    },
+    // router: {
+    //     middleware: ['auth'],
+    // },
 
     build: {
         postcss: {
