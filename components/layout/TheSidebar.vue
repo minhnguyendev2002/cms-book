@@ -18,11 +18,11 @@
             @openChange="handleOpenChange"
         >
             <template v-for="menuItem in menuItems">
-                <a-menu-item v-if="!menuItem.childrens.length" :key="menuItem.key">
+                <a-menu-item v-if="!menuItem.childrens.length && !checkPermission(menuItem.permission)" :key="menuItem.key">
                     <i :class="`${menuItem.classIcon}`" />
                     <span class="ml-3"> {{ menuItem.label }} </span>
                 </a-menu-item>
-                <a-sub-menu v-if="menuItem.childrens.length > 0" :key="menuItem.key">
+                <a-sub-menu v-if="menuItem.childrens.length > 0 && !checkPermission(menuItem.permission)" :key="menuItem.key">
                     <template #title>
                         <i :class="`${menuItem.classIcon}`" />
                         <span class="ml-3"> {{ menuItem.label }} </span>
@@ -91,20 +91,32 @@
                 return [{
                     label: 'Dashboard',
                     key: '/',
-                    permission: ['admin', 'teacher', 'user'],
+                    permission: ['admin'],
                     classIcon: 'isax isax-graph',
                     childrens: [],
                 }, {
-                    label: 'Quản lý sách',
-                    key: '/profile',
-                    permission: ['admin', 'teacher', 'user'],
+                    label: 'Cửa hàng',
+                    key: '/books',
+                    permission: ['admin', 'user'],
                     classIcon: 'isax isax-user',
                     childrens: [],
                 }, {
-                    label: 'Giỏ hàng',
-                    key: '/users',
+                    label: 'Giỏ hàng của tôi',
+                    key: '/my-cart',
+                    permission: ['user'],
+                    classIcon: 'isax isax-shopping-cart',
+                    childrens: [],
+                }, {
+                    label: 'Đơn hàng của tôi',
+                    key: '/my-order',
+                    permission: ['user'],
+                    classIcon: 'isax isax-receipt-item',
+                    childrens: [],
+                }, {
+                    label: 'Đơn hàng',
+                    key: '/orders',
                     permission: ['admin'],
-                    classIcon: 'isax isax-people',
+                    classIcon: 'isax isax-empty-wallet',
                     childrens: [],
                 }];
             },
@@ -145,6 +157,10 @@
 
             async confirm() {
                 this.$refs.confirm.open();
+            },
+
+            checkPermission(keys) {
+                return keys.includes(this.authUser.type || '');
             },
 
         },

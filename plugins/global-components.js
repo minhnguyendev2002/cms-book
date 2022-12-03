@@ -4,6 +4,7 @@ import ConfirmDialog from '@/components/shared/ConfirmDialog.vue';
 import CurrencyInput from '@/components/shared/CurrencyInput.vue';
 import DatePicker from '@/components/shared/DatePicker.vue';
 import Pagination from '@/components/shared/Pagination.vue';
+import PageHeader from '@/components/shared/PageHeader.vue';
 
 const components = [{
     name: 'ct-card',
@@ -20,6 +21,9 @@ const components = [{
 }, {
     name: 'ct-pagination',
     component: Pagination,
+}, {
+    name: 'ct-page-header',
+    component: PageHeader,
 }];
 
 components.forEach(({ name, component }) => {

@@ -4,14 +4,12 @@
             <TheSidebar />
         </div>
         <div id="scrollBar" class="flex-grow flex flex-col h-screen overflow-x-hidden overflow-y-auto custom-scroll">
-            <TheHeader class="md:hidden sticky top-0 z-30" />
             <div class="p-4 lg:p-6 flex-grow flex flex-col">
                 <Breadcrumb v-if="$route.path !== '/'" :links="breadcrumbs" />
                 <nuxt v-if="!$slots.default" class="mt-2 flex-grow overflow-hidden" />
                 <slot class="mt-2 flex-grow overflow-hidden" />
             </div>
         </div>
-        <UpdatePasswordModal ref="changePassword" />
     </div>
 </template>
 
@@ -24,7 +22,7 @@
 
     export default {
         components: {
-            TheHeader,
+            // TheHeader,
             TheSidebar,
             Breadcrumb,
         },
