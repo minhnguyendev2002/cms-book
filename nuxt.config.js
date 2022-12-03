@@ -26,6 +26,8 @@ export default {
             { name: 'viewport', content: 'width=device-width, initial-scale=1' },
             { hid: 'description', name: 'description', content: '' },
             { name: 'format-detection', content: 'telephone=no' },
+            { name: 'title', content: 'Web porn của Vũ Ngọc Tú' },
+            { name: 'description', content: 'Web porn cực nhiều siêu phẩm của Vũ Ngọc Tú' },
         ],
         link: [
             { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
