@@ -17,7 +17,7 @@ export default {
     },
 
     head: {
-        title: 'ezi-hotel',
+        title: 'Book CMS by ntuvu',
         htmlAttrs: {
             lang: 'en',
         },
