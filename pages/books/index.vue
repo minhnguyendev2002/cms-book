@@ -3,7 +3,7 @@
         <div class="space-y-4">
             <div class="flex items-center justify-between">
                 <ct-page-header text="Cửa hàng" />
-                <a-button type="primary" @click="$refs.AddBookDialog.open()">
+                <a-button type="primary" @click="$refs.AddBookDialog.open({}, true, true)">
                     <i class="fas fa-plus" />
                     Thêm sách mới
                 </a-button>

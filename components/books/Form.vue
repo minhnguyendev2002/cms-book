@@ -1,32 +1,29 @@
 <template>
     <a-form-model
-        ref="ruleForm"
-        :model="ruleForm"
+        ref="form"
+        :model="form"
         :rules="rules"
     >
         <div class="grid grid-cols-2 gap-5">
             <div>
-                <a-form-model-item label="Password" prop="pass">
+                <a-form-model-item label="Tiêu đề" prop="title">
                     <a-input
-                        v-model="ruleForm.pass"
+                        v-model="form.title"
                         :disabled="!isEdit"
-                        type="password"
                         autocomplete="off"
                     />
                 </a-form-model-item>
-                <a-form-model-item label="Confirm" prop="checkPass">
+                <a-form-model-item label="Tác giả" prop="author">
                     <a-input
-                        v-model="ruleForm.checkPass"
+                        v-model="form.author"
                         :disabled="!isEdit"
-                        type="password"
                         autocomplete="off"
                     />
                 </a-form-model-item>
-                <a-form-model-item label="Confirm" prop="checkPass" class="col-span-2">
+                <a-form-model-item label="Mô tả về sách" class="col-span-2">
                     <a-textarea
-                        v-model="ruleForm.checkPass"
+                        v-model="form.description"
                         :disabled="!isEdit"
-                        type="password"
                         autocomplete="off"
                     />
                 </a-form-model-item>
@@ -35,8 +32,9 @@
                 <a-upload
                     :show-upload-list="false"
                     action=""
-                    :transform-file="handlerAvatar"
+                    :transform-file="handlerThumbnail"
                     :disabled="!isEdit"
+                    accept="image/png, image/jpeg"
                 >
                     <div class="flex gap-x-2">
                         <img src="/images/upload.svg" alt="avatar">
@@ -44,52 +42,63 @@
                     </div>
                 </a-upload>
                 <img
-                    v-if="ruleForm.avatar"
-                    :src="ruleForm.avatar"
+                    v-if="form.thumbnail"
+                    :src="form.thumbnail"
                     onerror="this.src='/images/default-avatar.png'"
                     alt=""
-                    class="w-56 h-60 rounded"
+                    class="w-56 h-60 rounded object-cover"
                 >
                 <div v-else class="w-56 h-60 rounded border-dashed border border-gray-400 flex justify-center items-center">
-                    <span><i class="fas fa-plus" /></span>
+                    <span>Chưa có ảnh</span>
                 </div>
             </div>
-            <a-form-model-item label="Password" prop="pass">
+            <a-form-model-item label="Ngày phát hành" prop="dateCreate">
                 <a-input
-                    v-model="ruleForm.pass"
+                    v-model="form.dateCreate"
                     :disabled="!isEdit"
-                    type="password"
                     autocomplete="off"
                 />
             </a-form-model-item>
-            <a-form-model-item label="Confirm" prop="checkPass">
+            <a-form-model-item label="Số trang" prop="countPage">
                 <a-input
-                    v-model="ruleForm.checkPass"
+                    v-model.number="form.countPage"
                     :disabled="!isEdit"
-                    type="password"
                     autocomplete="off"
                 />
             </a-form-model-item>
-            <a-form-model-item label="Password" prop="pass">
+            <a-form-model-item label="Thể loại" prop="type">
                 <a-input
-                    v-model="ruleForm.pass"
+                    v-model="form.type"
                     :disabled="!isEdit"
-                    type="password"
                     autocomplete="off"
                 />
             </a-form-model-item>
-            <a-form-model-item label="Confirm" prop="checkPass">
+            <a-form-model-item label="Giá tiền" prop="price">
                 <a-input
-                    v-model="ruleForm.checkPass"
+                    v-model="form.price"
                     :disabled="!isEdit"
-                    type="password"
                     autocomplete="off"
                 />
             </a-form-model-item>
         </div>
     </a-form-model>
 </template>
-  <script>
+<script>
+    import _cloneDeep from 'lodash/cloneDeep';
+    import { validNumberString } from '@/utils/form';
+
+    const defaultForm = {
+        id: null,
+        title: '',
+        description: '',
+        author: '',
+        dateCreate: '',
+        countPage: '',
+        type: '',
+        price: '',
+        thumbnail: '',
+    };
+
     export default {
         props: {
             isEdit: {
@@ -102,58 +111,23 @@
             },
         },
         data() {
-            let checkPending;
-            const checkAge = (rule, value, callback) => {
-                clearTimeout(checkPending);
-                if (!value) {
-                    return callback(new Error('Please input the age'));
-                }
-                checkPending = setTimeout(() => {
-                    if (!Number.isInteger(value)) {
-                        callback(new Error('Please input digits'));
-                    } else if (value < 18) {
-                        callback(new Error('Age must be greater than 18'));
-                    } else {
-                        callback();
-                    }
-                }, 1000);
-            };
-            const validatePass = (rule, value, callback) => {
-                if (value === '') {
-                    callback(new Error('Please input the password'));
-                } else {
-                    if (this.ruleForm.checkPass !== '') {
-                        this.$refs.ruleForm.validateField('checkPass');
-                    }
-                    callback();
-                }
-            };
-            const validatePass2 = (rule, value, callback) => {
-                if (value === '') {
-                    callback(new Error('Please input the password again'));
-                } else if (value !== this.ruleForm.pass) {
-                    callback(new Error("Two inputs don't match!"));
-                } else {
-                    callback();
-                }
-            };
             return {
                 fileAvatar: null,
-                ruleForm: {
-                    pass: '',
-                    checkPass: '',
-                    age: '',
-                },
+                form: this.book ? _cloneDeep(this.book) : _cloneDeep(defaultForm),
                 rules: {
-                    pass: [{ validator: validatePass, trigger: 'change' }],
-                    checkPass: [{ validator: validatePass2, trigger: 'change' }],
-                    age: [{ validator: checkAge, trigger: 'change' }],
+                    title: [{ required: true, message: 'Không được để trống trường này.', trigger: 'change' }],
+                    author: [{ required: true, message: 'Không được để trống trường này.', trigger: 'change' }],
+                    dateCreate: [{ required: true, message: 'Không được để trống trường này.', trigger: 'change' }],
+                    countPage: [{ required: true, message: 'Không được để trống trường này.', trigger: 'change' },
+                                { validator: validNumberString, message: 'Vui lòng nhập đúng định dạng là số', trigger: 'change' }],
+                    type: [{ required: true, message: 'Không được để trống trường này.', trigger: 'change' }],
+                    price: [{ required: true, message: 'Không được để trống trường này.', trigger: 'change' }],
                 },
             };
         },
         methods: {
-            submitForm(formName) {
-                this.$refs[formName].validate((valid) => {
+            submitForm() {
+                this.$refs.form.validate((valid) => {
                     if (valid) {
                         alert('submit!');
                     } else {
@@ -162,12 +136,12 @@
                     }
                 });
             },
-            handlerAvatar(file) {
-                this.fileAvatar = file;
-                this.ruleForm.avatar = URL.createObjectURL(file);
+            handlerThumbnail(file) {
+                this.fileThumbnail = file;
+                this.form.thumbnail = URL.createObjectURL(file);
             },
-            resetForm(formName) {
-                this.$refs[formName].resetFields();
+            resetForm() {
+                this.$refs.form.resetFields();
             },
         },
     };

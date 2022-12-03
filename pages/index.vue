@@ -3,7 +3,7 @@
         <div class="space-y-4">
             <ct-page-header text="Dashbroad" />
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-12 gap-5 items-start">
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-5 items-start mt-6">
             <div class="sm:col-span-6 sm:grid-cols-1 lg:col-span-8 xl:col-span-9 xl:grid-cols-3 grid items-center gap-5">
                 <a-spin v-for="item in items" :key="item.title" :spinning="loading">
                     <div class="duration-150 relative overflow-hidden flex items-center p-6 shadow-md hover:shadow-xl rounded-md bg-gradient-to-r" :class="[`from-${item.bgFrom}`, `to-${item.bgTo}`]">

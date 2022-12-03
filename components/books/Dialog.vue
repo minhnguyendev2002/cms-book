@@ -3,7 +3,7 @@
         v-model="visible"
         destroy-on-close
         :after-close="empty"
-        title="Thêm sách"
+        title="Chi tiết sách"
         width="800px"
         :footer="false"
     >
@@ -13,11 +13,8 @@
             </div>
         </a-spin>
         <div class="mt-10 flex items-center justify-end gap-3">
-            <a-button class="!w-32">
-                Hủy bỏ
-            </a-button>
             <a-button type="primary" class="!w-32">
-                Thêm
+                {{ isEdit && !isCreate ? 'Cập nhật' : !isCreate ? 'Chỉnh sửa': 'Thêm' }}
             </a-button>
         </div>
     </a-modal>
@@ -48,16 +45,18 @@
                 book: defaultUser,
                 fetchLoading: false,
                 isEdit: true,
+                isCreate: false,
             };
         },
 
         methods: {
             _get,
 
-            async open(book, type = true) {
+            async open(book, type = true, isCreate = false) {
                 this.visible = true;
                 this.isEdit = type;
                 this.book = book;
+                this.isCreate = isCreate;
             },
 
             close() {

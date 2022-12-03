@@ -38,12 +38,19 @@
         <div class="border-t border-prim-300 pt-3">
             <div class="flex items-center gap-3">
                 <div class="border border-gray-100 rounded-md overflow-hidden">
-                    <img :src="authUser.avatar || '/images/default-avatar.png'" onerror="this.src='/images/default-avatar.png'" class="w-12 aspect-square object-cover">
+                    <img
+                        :src="authUser.avatar || '/images/default-avatar.jpg'"
+                        onerror="this.src='/images/default-avatar.jpg'"
+                        class="w-12 aspect-square object-cover"
+                    >
                 </div>
                 <div>
-                    <nuxt-link to="/profile" class="font-medium text-gray-900 hover:underline">
-                        {{ authUser.firstName || '' }} {{ authUser.lastName || '' }}
-                    </nuxt-link>
+                    <div class="font-medium text-gray-900 hover:underline">
+                        {{ authUser.fullName || 'Vũ Ngọc Tú' }}
+                    </div>
+                    <span>
+                        {{ authUser.role || 'Admin' }}
+                    </span>
                 </div>
             </div>
             <a-button

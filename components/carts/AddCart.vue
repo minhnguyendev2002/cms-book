@@ -32,7 +32,7 @@
                             :rules="rules"
                         >
                             <a-form-model-item label="Số lượng" prop="checkPass">
-                                <a-input type="password" autocomplete="off" />
+                                <a-input placeholder="Nhập số lượng" />
                             </a-form-model-item>
                             <a-form-model />
                         </a-form-model>
@@ -41,9 +41,6 @@
             </div>
         </div>
         <div class="mt-10 flex items-center justify-end gap-3">
-            <a-button class="!w-32">
-                Hủy bỏ
-            </a-button>
             <a-button type="primary" class="!w-32">
                 Thêm giỏ hàng
             </a-button>
