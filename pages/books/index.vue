@@ -11,16 +11,7 @@
         </div>
 
         <div class="grid grid-cols-12 gap-5 mt-6">
-            <CardBook class="col-span-4" />
-            <CardBook class="col-span-4" />
-            <CardBook class="col-span-4" />
-            <CardBook class="col-span-4" />
-            <CardBook class="col-span-4" />
-            <CardBook class="col-span-4" />
-            <CardBook class="col-span-4" />
-            <CardBook class="col-span-4" />
-            <CardBook class="col-span-4" />
-            <CardBook class="col-span-4" />
+            <CardBook v-for="book in books" :key="book.id" class="col-span-4" />
         </div>
 
         <AddBookDialog ref="AddBookDialog" />
@@ -28,15 +19,34 @@
 </template>
 
 <script>
+    import { mapState } from 'vuex';
     import CardBook from '@/components/books/Card.vue';
     import AddBookDialog from '@/components/books/Dialog.vue';
 
     export default {
-        auth: false,
         components: {
             CardBook,
             AddBookDialog,
         },
+
+        async fetch() {
+            await this.fetchData();
+        },
+
+        computed: {
+            ...mapState('books', ['books']),
+        },
+
+        methods: {
+            async fetchData() {
+                try {
+                    await this.$store.dispatch('books/fetchAll', this.$route.query);
+                } catch (e) {
+                    this.$handleError(e);
+                }
+            },
+        },
+
         head() {
             return {
                 title: 'Cửa hàng | CMS Book',

@@ -3,13 +3,29 @@
         v-model="visible"
         destroy-on-close
         :after-close="empty"
-        title="Chi tiết sách"
+        :title="!isCreate ? 'Chi tiết sách': 'Thêm mới sách'"
         width="800px"
         :footer="false"
     >
         <a-spin :spinning="fetchLoading">
             <div class="">
                 <BookForm :book="book" :is-edit="isEdit" />
+            </div>
+            <div v-if="!isCreate" class="mt-10">
+                <h2 class="mb-5">
+                    Bình luận
+                </h2>
+                <div>
+                    <div class="flex items-center gap-5">
+                        <img class="w-20 h-20 object-cover rounded-full" src="/images/default-avatar.jpg" alt="/">
+                        <div class="flex-1">
+                            <h3>Tú Porn</h3>
+                            <p class="mb-0">
+                                Đây là web porn
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </a-spin>
         <div class="mt-10 flex items-center justify-end gap-3">

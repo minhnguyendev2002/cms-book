@@ -25,6 +25,7 @@
                         v-model="form.description"
                         :disabled="!isEdit"
                         autocomplete="off"
+                        :auto-size="{ minRows: 5, maxRows: 5 }"
                     />
                 </a-form-model-item>
             </div>
@@ -42,13 +43,13 @@
                     </div>
                 </a-upload>
                 <img
-                    v-if="form.thumbnail"
-                    :src="form.thumbnail"
+                    v-if="imageThumbnail"
+                    :src="imageThumbnail"
                     onerror="this.src='/images/default-avatar.png'"
                     alt=""
-                    class="w-56 h-60 rounded object-cover"
+                    class="w-56 h-72 rounded object-cover"
                 >
-                <div v-else class="w-56 h-60 rounded border-dashed border border-gray-400 flex justify-center items-center">
+                <div v-else class="w-56 h-72 rounded border-dashed border border-gray-400 flex justify-center items-center">
                     <span>Chưa có ảnh</span>
                 </div>
             </div>
@@ -86,6 +87,7 @@
 <script>
     import _cloneDeep from 'lodash/cloneDeep';
     import { validNumberString } from '@/utils/form';
+    import { BOOK_TYPE, BOOK_TYPE_OPTIONS } from '@/constants/typeBook';
 
     const defaultForm = {
         id: null,
@@ -112,7 +114,10 @@
         },
         data() {
             return {
-                fileAvatar: null,
+                BOOK_TYPE,
+                BOOK_TYPE_OPTIONS,
+                fileThumbnail: null,
+                imageThumbnail: null,
                 form: this.book ? _cloneDeep(this.book) : _cloneDeep(defaultForm),
                 rules: {
                     title: [{ required: true, message: 'Không được để trống trường này.', trigger: 'change' }],
@@ -125,6 +130,13 @@
                 },
             };
         },
+
+        watch: {
+            imageThumbnail() {
+                this.form.thumbnail = this.imageThumbnail;
+            },
+        },
+
         methods: {
             submitForm() {
                 this.$refs.form.validate((valid) => {
@@ -138,7 +150,7 @@
             },
             handlerThumbnail(file) {
                 this.fileThumbnail = file;
-                this.form.thumbnail = URL.createObjectURL(file);
+                this.imageThumbnail = URL.createObjectURL(file);
             },
             resetForm() {
                 this.$refs.form.resetFields();

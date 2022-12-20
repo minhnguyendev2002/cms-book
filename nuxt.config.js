@@ -99,7 +99,7 @@ export default {
         strategies: {
             local: {
                 token: {
-                    property: 'data.sid',
+                    property: 'access_token',
                     global: true,
                     required: true,
                     name: 'auth',
@@ -108,21 +108,17 @@ export default {
                 },
                 autoLogout: false,
                 user: {
-                    property: 'data.account',
-                    autoFetch: true,
+                    property: 'data',
+                    autoFetch: false,
                 },
                 endpoints: {
                     login: {
-                        url: `${process.env.API_HOST}/user/login`,
-                        method: 'POST',
-                    },
-                    logout: {
-                        url: `${process.env.API_HOST}/user/logout`,
-                        method: 'GET',
+                        url: '/login',
+                        method: 'post',
                     },
                     user: {
-                        url: `${process.env.API_HOST}/user/get_profile`,
-                        method: 'POST',
+                        url: '/auth/me',
+                        method: 'get',
                     },
                 },
                 redirect: {
@@ -135,9 +131,9 @@ export default {
         },
     },
 
-    // router: {
-    //     middleware: ['auth'],
-    // },
+    router: {
+        middleware: ['auth'],
+    },
 
     build: {
         postcss: {
@@ -174,7 +170,7 @@ export default {
     },
 
     env: {
-        API_HOST: process.env.API_HOST || 'localhost',
+        API_HOST: process.env.API_HOST,
         RSA_PUBLIC_KEY: process.env.RSA_PUBLIC_KEY,
     },
 };

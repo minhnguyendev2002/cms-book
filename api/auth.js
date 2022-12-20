@@ -1,5 +1,4 @@
 export default (axios) => ({
-    getMenuItems: () => axios.get('/user/menus').then((_) => _.data),
-    updateProfile: (data) => axios.post('/user/update_profile', data).then((_) => _.data),
-    updatePassword: (data) => axios.post('/user/change_password', data).then((_) => _.data),
+    signIn: (payload) => axios.post('/auth/signup', payload).then((_) => _.data),
+    signUp: (payload) => axios.post('/login', payload).then((_) => _.data),
 });

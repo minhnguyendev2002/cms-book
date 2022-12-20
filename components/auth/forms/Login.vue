@@ -4,9 +4,9 @@
         :model="form"
         :rules="rules"
     >
-        <a-form-model-item prop="identifier" label="Tên đăng nhập" class="!mb-2">
+        <a-form-model-item prop="username" label="Tên đăng nhập" class="!mb-2">
             <a-input
-                v-model="form.identifier"
+                v-model="form.username"
                 placeholder="Nhập tên đăng nhập"
                 @keyup.native.enter="submit"
             >
@@ -33,7 +33,7 @@
     import _cloneDeep from 'lodash/cloneDeep';
 
     const defaultForm = {
-        identifier: '',
+        username: '',
         password: '',
     };
 
@@ -46,11 +46,10 @@
         },
 
         data() {
-            const userInfo = JSON.parse(window.localStorage.getItem('userInfo'));
             return {
-                form: userInfo || _cloneDeep(defaultForm),
+                form: _cloneDeep(defaultForm),
                 rules: {
-                    identifier: [
+                    username: [
                         { required: true, message: 'Không được để trống trường này', trigger: 'blur' },
                     ],
                     password: [
@@ -64,11 +63,6 @@
             submit() {
                 this.$refs.form.validate(async (valid) => {
                     if (valid) {
-                        this.form = {
-                            ...this.form,
-                            identifier: this.form.identifier.trim(),
-                            // password: this.form.password.trim(),
-                        };
                         this.$emit('submit', this.form);
                     }
                 });
