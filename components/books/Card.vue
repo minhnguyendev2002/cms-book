@@ -32,7 +32,12 @@
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <a-button type="primary" class="!rounded-full !h-12 !w-12" @click="$refs.BookDialog.open(book, true, false, thumbnail)">
+                <a-button
+                    v-if="$isAdmin()"
+                    type="primary"
+                    class="!rounded-full !h-12 !w-12"
+                    @click="$refs.BookDialog.open(book, true, false, thumbnail)"
+                >
                     <i class="fas fa-pen" />
                 </a-button>
                 <a-button type="primary" class="!rounded-full !h-12 !w-12" @click="$refs.BookDialog.open(book, false, false, thumbnail)">

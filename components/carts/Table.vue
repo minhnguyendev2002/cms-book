@@ -70,11 +70,17 @@
                             <i class="fas fa-ellipsis-h" />
                         </a-button>
                         <a-menu slot="overlay">
-                            <a-menu-item @click="$refs.BookDialog.open(scope.book, false)">
+                            <a-menu-item @click="$refs.CartDialog.open(scope.book, false, scope)">
                                 <i class="w-4 mr-2 isax isax-edit-2" />
                                 Xem chi tiết
                             </a-menu-item>
-                            <a-menu-item class="!text-danger-900" @click="$refs.ConfirmDialog.open()">
+                            <a-menu-item
+                                class="!text-danger-900"
+                                @click="() => {
+                                    $refs.ConfirmDialog.open(),
+                                    selectCart(scope)
+                                }"
+                            >
                                 <i class="w-4 mr-2 isax isax-trash" />
                                 Xóa khỏi giỏ hàng
                             </a-menu-item>
@@ -83,22 +89,23 @@
                 </template>
             </a-table-column>
         </a-table>
-        <BookDialog ref="BookDialog" />
+        <CartDialog ref="CartDialog" />
         <ConfirmDialog
             ref="ConfirmDialog"
             title="Xác nhận xóa"
             content="Bạn chắc chắn muốn xóa quyển sách này trong giỏ hàng chứ"
+            @confirm="deleteCart"
         />
     </div>
 </template>
 
 <script>
-    import BookDialog from '@/components/books/Dialog.vue';
+    import CartDialog from '@/components/carts/AddCart.vue';
     import ConfirmDialog from '@/components/shared/ConfirmDialog.vue';
 
     export default {
         components: {
-            BookDialog,
+            CartDialog,
             ConfirmDialog,
         },
 
@@ -118,6 +125,7 @@
             return {
                 selectedBookIds: [],
                 selectedBooks: [],
+                cart: null,
             };
         },
 
@@ -128,6 +136,18 @@
         },
 
         methods: {
+            selectCart(value) {
+                this.cart = value;
+            },
+            async deleteCart() {
+                try {
+                    await this.$api.carts.delete(this.cart?.id);
+                    this.$message.success('Thành công');
+                    this.$nuxt.refresh();
+                } catch (e) {
+                    this.$handleError(e);
+                }
+            },
             onSelectChange(selectedBookIds, selectedBooks) {
                 this.selectedBookIds = selectedBookIds;
                 this.selectedBooks = selectedBooks;

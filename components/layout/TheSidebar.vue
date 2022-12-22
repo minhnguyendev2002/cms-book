@@ -1,10 +1,9 @@
 <template>
     <div class="!w-[270px] h-screen bg-white flex flex-col p-3">
-        <div class="flex justify-between items-center">
-            <nuxt-link to="/" class="flex items-center gap-3">
-                <img src="https://inkythuatso.com/uploads/images/2021/12/logo-pornhub-inkythuatso-21-15-41-06.jpg" width="66">
-                <div class="font-medium text-second-900">
-                    Web Porn VuNgocTu
+        <div class="flex justify-center items-center py-3">
+            <nuxt-link to="/" class="flex items-center justify-center gap-3">
+                <div class="font-medium text-second-900 text-center text-xl">
+                    Build with VuNgocTu
                 </div>
             </nuxt-link>
         </div>
@@ -17,22 +16,18 @@
             @click="handleClick"
             @openChange="handleOpenChange"
         >
-            <template v-for="menuItem in menuItems">
-                <a-menu-item v-if="!menuItem.childrens.length && !checkPermission(menuItem.permission)" :key="menuItem.key">
-                    <i :class="`${menuItem.classIcon}`" />
-                    <span class="ml-3"> {{ menuItem.label }} </span>
-                </a-menu-item>
-                <a-sub-menu v-if="menuItem.childrens.length > 0 && !checkPermission(menuItem.permission)" :key="menuItem.key">
-                    <template #title>
-                        <i :class="`${menuItem.classIcon}`" />
-                        <span class="ml-3"> {{ menuItem.label }} </span>
-                    </template>
-                    <a-menu-item v-for="child in menuItem.childrens" :key="child.key">
-                        <i :class="`${child.classIcon}`" />
-                        <span class="ml-3"> {{ child.label }} </span>
-                    </a-menu-item>
-                </a-sub-menu>
-            </template>
+            <a-menu-item key="/">
+                <i class="isax isax-graph" />
+                <span class="ml-3"> Cửa hàng </span>
+            </a-menu-item>
+            <a-menu-item key="/my-cart">
+                <i class="isax isax-shopping-cart" />
+                <span class="ml-3"> Giỏ hàng của tôi </span>
+            </a-menu-item>
+            <a-menu-item v-if="checkAdmin" key="/users">
+                <i class="isax isax-user" />
+                <span class="ml-3"> Quản lý Người dùng </span>
+            </a-menu-item>
         </a-menu>
 
         <div class="border-t border-prim-300 pt-3">
@@ -46,10 +41,10 @@
                 </div>
                 <div>
                     <div class="font-medium text-gray-900 hover:underline">
-                        {{ authUser.fullName || 'Vũ Ngọc Tú' }}
+                        {{ authUser.username || 'Vũ Ngọc Tú' }}
                     </div>
                     <span>
-                        {{ authUser.role || 'Admin' }}
+                        {{ !checkAdmin ? 'User' : 'Admin' }}
                     </span>
                 </div>
             </div>
@@ -57,7 +52,7 @@
                 type="primary"
                 class="mt-3 w-full"
                 size="small"
-                @click="confirm"
+                @click="logout"
             >
                 <i class="fa-solid fa-right-from-bracket" />
                 Đăng xuất
@@ -87,27 +82,15 @@
 
         computed: {
             activeKeys() {
-                // console.log(this.$route.path);
                 return [this.$route.path];
             },
 
             authUser() {
                 return this.$auth.user || {};
             },
-            menuItems() {
-                return [{
-                    label: 'Cửa hàng',
-                    key: '/',
-                    permission: ['admin'],
-                    classIcon: 'isax isax-graph',
-                    childrens: [],
-                }, {
-                    label: 'Giỏ hàng của tôi',
-                    key: '/my-cart',
-                    permission: ['user'],
-                    classIcon: 'isax isax-shopping-cart',
-                    childrens: [],
-                }];
+
+            checkAdmin() {
+                return this.authUser.authorities.filter((item) => item.authority === 'ROLE_ADMIN').length > 0;
             },
         },
 
@@ -119,7 +102,6 @@
             async fetchData() {
                 try {
                     this.loading = true;
-                    // await this.$store.dispatch('notifications/fetchAll', this.$route.query);
                 } catch (error) {
                     this.$handleError(error);
                 } finally {
@@ -144,14 +126,10 @@
                 this.visible = visible;
             },
 
-            async confirm() {
-                this.$refs.confirm.open();
+            async logout() {
+                await this.$auth.logout();
+                window.location.replace('/login');
             },
-
-            checkPermission(keys) {
-                return keys.includes(this.authUser.type || '');
-            },
-
         },
     };
 </script>

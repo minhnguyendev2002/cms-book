@@ -122,6 +122,7 @@ export default {
                         url: '/auth/me',
                         method: 'GET',
                     },
+                    logout: false,
                 },
                 redirect: {
                     login: '/login',

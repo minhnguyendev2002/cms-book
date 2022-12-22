@@ -1,5 +1,5 @@
 export default (context, inject) => {
-    const isAdmin = () => !!this.$auth.user.authorities.find((item) => item.authority === 'ROLE_ADMIN');
+    const isAdmin = () => context.$auth.user.authorities.filter((item) => item.authority === 'ROLE_ADMIN').length > 0;
 
     inject('isAdmin', isAdmin);
 };

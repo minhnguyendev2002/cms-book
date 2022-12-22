@@ -4,25 +4,25 @@
         :model="form"
         :rules="rules"
     >
-        <a-form-model-item prop="identifier" label="Tên đăng nhập" class="!mb-2">
+        <a-form-model-item prop="username" label="Tên tài khoản" class="!mb-2">
             <a-input
-                v-model="form.identifier"
-                placeholder="Nhập tên đăng nhập"
+                v-model="form.username"
+                placeholder="Nhập tên tài khoản"
                 @keyup.native.enter="submit"
             >
                 <template #prefix>
-                    <i class="far fa-user text-prim-90" />
+                    <i class="far fa-user text-prim-900" />
                 </template>
             </a-input>
         </a-form-model-item>
-        <a-form-model-item prop="identifier" label="Tên đăng nhập" class="!mb-2">
+        <a-form-model-item prop="email" label="Email" class="!mb-2">
             <a-input
-                v-model="form.identifier"
-                placeholder="Nhập tên đăng nhập"
+                v-model="form.email"
+                placeholder="Nhập tên Email"
                 @keyup.native.enter="submit"
             >
                 <template #prefix>
-                    <i class="far fa-user text-prim-90" />
+                    <i class="fas fa-envelope text-prim-900" />
                 </template>
             </a-input>
         </a-form-model-item>
@@ -33,7 +33,7 @@
                 @keyup.native.enter="submit"
             >
                 <template #prefix>
-                    <i class="fas fa-unlock-alt text-prim-90" />
+                    <i class="fas fa-unlock-alt text-prim-900" />
                 </template>
             </a-input-password>
         </a-form-model-item>
@@ -42,9 +42,10 @@
 
 <script>
     import _cloneDeep from 'lodash/cloneDeep';
+    import { validEmail } from '@/utils/form';
 
     const defaultForm = {
-        identifier: '',
+        username: '',
         password: '',
     };
 
@@ -57,15 +58,18 @@
         },
 
         data() {
-            const userInfo = JSON.parse(window.localStorage.getItem('userInfo'));
             return {
-                form: userInfo || _cloneDeep(defaultForm),
+                form: _cloneDeep(defaultForm),
                 rules: {
-                    identifier: [
+                    username: [
                         { required: true, message: 'Không được để trống trường này', trigger: 'blur' },
                     ],
                     password: [
                         { required: true, message: 'Không được để trống trường này', trigger: 'blur' },
+                    ],
+                    email: [
+                        { required: true, message: 'Không được để trống trường này', trigger: 'blur' },
+                        { validator: validEmail, trigger: 'change' },
                     ],
                 },
             };
@@ -75,11 +79,6 @@
             submit() {
                 this.$refs.form.validate(async (valid) => {
                     if (valid) {
-                        this.form = {
-                            ...this.form,
-                            identifier: this.form.identifier.trim(),
-                            // password: this.form.password.trim(),
-                        };
                         this.$emit('submit', this.form);
                     }
                 });

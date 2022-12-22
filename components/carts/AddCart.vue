@@ -3,7 +3,7 @@
         v-model="visible"
         destroy-on-close
         :after-close="empty"
-        title="Thêm vào giỏ hàng"
+        :title="isUpdate ? 'Chi tiết đơn hàng' : 'Thêm giỏ hàng'"
         width="800px"
         :footer="false"
     >
@@ -54,8 +54,21 @@
             </div>
         </div>
         <div class="mt-10 flex items-center justify-end gap-3">
-            <a-button type="primary" class="!w-32" @click="createCart">
+            <a-button
+                v-if="!isUpdate"
+                type="primary"
+                class="!w-32"
+                @click="createCart"
+            >
                 Thêm giỏ hàng
+            </a-button>
+            <a-button
+                v-else
+                type="primary"
+                class="!w-32"
+                @click="updateCart"
+            >
+                Cập nhật
             </a-button>
         </div>
     </a-modal>
@@ -65,8 +78,6 @@
     import _get from 'lodash/get';
 
     export default {
-        components: {
-        },
         data() {
             return {
                 visible: false,
@@ -74,15 +85,20 @@
                 thumbnail: null,
                 amount: 1,
                 fetchLoading: false,
+                isUpdate: false,
+                cart: null,
             };
         },
 
         methods: {
             _get,
 
-            async open(book) {
+            async open(book, isUpdate = false, cart = {}) {
                 this.visible = true;
+                this.isUpdate = isUpdate;
+                this.cart = cart;
                 await this.fetchBook(book);
+                this.amount = cart?.amount || 1;
             },
 
             close() {
@@ -108,12 +124,23 @@
                 }
             },
 
+            async updateCart() {
+                try {
+                    this.book = await this.$api.carts.update(this.cart.id, { amount: this.amount });
+                    this.$message.success('Thành công');
+                    this.close();
+                    this.$nuxt.refresh();
+                } catch (e) {
+                    this.$handleError(e);
+                }
+            },
+
             async fetchBook(book) {
                 if (book) {
                     try {
                         this.book = await this.$api.books.getDetail(book?.id);
-                        if (book?.imageId) {
-                            this.thumbnail = await this.$api.uploaders.getFiles(this.book?.imageId);
+                        if (this.book.imageId) {
+                            this.thumbnail = await this.$api.uploaders.getFiles(this.book.imageId);
                         }
                     } catch (e) {
                         this.$handleError(e);

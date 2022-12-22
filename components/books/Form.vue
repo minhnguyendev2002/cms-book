@@ -10,21 +10,21 @@
                     <a-input
                         v-model="form.title"
                         :disabled="!isEdit"
-                        autocomplete="off"
+                        placeholder="Nhập tiêu đề"
                     />
                 </a-form-model-item>
                 <a-form-model-item label="Tác giả" prop="author">
                     <a-input
                         v-model="form.author"
                         :disabled="!isEdit"
-                        autocomplete="off"
+                        placeholder="Tên tác giả"
                     />
                 </a-form-model-item>
                 <a-form-model-item label="Mô tả về sách" class="col-span-2">
                     <a-textarea
                         v-model="form.description"
                         :disabled="!isEdit"
-                        autocomplete="off"
+                        placeholder="Thêm mô tả"
                         :auto-size="{ minRows: 5, maxRows: 5 }"
                     />
                 </a-form-model-item>
@@ -39,7 +39,7 @@
                 >
                     <div class="flex gap-x-2">
                         <img src="/images/upload.svg" alt="avatar">
-                        Tải ảnh lên
+                        {{ $isAdmin() || !isEdit ? "Tải ảnh lên" : "" }}
                     </div>
                 </a-upload>
                 <img
@@ -53,7 +53,7 @@
                     <span>Chưa có ảnh</span>
                 </div>
             </div>
-            <a-form-model-item label="Ngày phát hành" prop="releaseDate">
+            <a-form-model-item label="Ngày phát hành" class="mt-auto" prop="releaseDate">
                 <a-date-picker
                     v-model="form.releaseDate"
                     class="w-full"
@@ -67,13 +67,14 @@
                 <a-input
                     v-model.number="form.pageNumber"
                     :disabled="!isEdit"
-                    autocomplete="off"
+                    placeholder="Nhập số trang"
                 />
             </a-form-model-item>
             <a-form-model-item label="Thể loại" prop="category">
                 <a-select
                     v-model="form.category"
                     placeholder="Thể loại"
+                    :disabled="!isEdit"
                 >
                     <a-select-option v-for="item in BOOK_TYPE_OPTIONS" :key="item.value" :value="item.label">
                         {{ item.label }}
@@ -84,12 +85,14 @@
                 <a-input
                     v-model="form.cost"
                     :disabled="!isEdit"
+                    placeholder="Giá tiền sách"
                 />
             </a-form-model-item>
             <a-form-model-item label="Số lượng" prop="total">
                 <a-input
                     v-model="form.total"
                     :disabled="!isEdit"
+                    placeholder="Số lượng"
                 />
             </a-form-model-item>
         </div>

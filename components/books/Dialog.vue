@@ -21,7 +21,7 @@
                 <h2 class="mb-5">
                     Bình luận
                 </h2>
-                <div class="mb-5">
+                <div class="mb-8">
                     <a-form-model-item label="Bình luận" prop="comment">
                         <a-textarea
                             v-model="comment"
@@ -45,19 +45,24 @@
                     </div>
                 </div>
                 <div v-if="comments">
-                    <div v-for="_comment in comments" :key="_comment.id" class="flex items-center gap-5">
-                        <img class="w-20 h-20 object-cover rounded-full" src="/images/default-avatar.jpg" alt="/">
-                        <div class="flex-1">
-                            <h3>Tú Porn</h3>
-                            <p class="mb-0">
-                                Đây là web porn
-                            </p>
+                    <div v-for="_comment in comments" :key="_comment.id" class="flex justify-between gap-5 mb-5 last:mb-0">
+                        <div class="flex items-center gap-5">
+                            <img class="w-20 h-20 object-cover rounded-full" src="/images/default-avatar.jpg" alt="/">
+                            <div class="flex-1">
+                                <h3>{{ _comment.username }}</h3>
+                                <p class="mb-0">
+                                    {{ _comment.content }}
+                                </p>
+                            </div>
+                        </div>
+                        <div>
+                            <a-rate :value="_comment.star" disabled />
                         </div>
                     </div>
                 </div>
             </div>
         </a-spin>
-        <div class="mt-10 flex items-center justify-end gap-3">
+        <div v-if="$isAdmin() && isEdit" class="mt-10 flex items-center justify-end gap-3">
             <a-button type="primary" class="!w-32" @click="$refs.BookForm.submit()">
                 {{ isCreate ? 'Thêm': 'Cập nhật' }}
             </a-button>
@@ -112,18 +117,22 @@
             async submitBook(book, thumbnail) {
                 try {
                     if (!_isEmpty(this.book)) {
-                        await this.$api.uploaders.uploadFiles(book?.id, convertToFormData({
-                            file: thumbnail,
-                        }));
+                        if (book.imageId) {
+                            await this.$api.uploaders.updateImage(book?.imageId, convertToFormData({
+                                file: thumbnail,
+                            }));
+                        } else {
+                            await this.$api.uploaders.uploadFiles(book?.id, convertToFormData({
+                                file: thumbnail,
+                            }));
+                        }
                         await this.updateBook(book);
                     } else {
                         await this.createBook(book);
                     }
                     this.$message.success('Thành Công');
+                    this.$nuxt.refresh();
                     this.close();
-                    this.$nextTick(() => {
-                        this.$nuxt.refresh();
-                    });
                 } catch (e) {
                     this.$message.error('Thất bại');
                     this.$handleError(e);
@@ -151,11 +160,10 @@
                     await this.$api.reviews.create({
                         bookId: this.book?.id,
                         content: this.comment,
-                        rate: this.rate,
+                        star: this.rate,
                     });
-                    this.$nextTick(() => {
-                        this.$nuxt.refresh();
-                    });
+                    this.comments = await this.$api.reviews.getAll(this.book.id);
+                    this.comment = '';
                 } catch (e) {
                     this.$handleError(e);
                 }
@@ -166,7 +174,7 @@
                     try {
                         this.book = await this.$api.books.getDetail(book?.id);
                         this.comments = await this.$api.reviews.getAll(book?.id);
-                        if (book?.imageId) {
+                        if (this.book.imageId) {
                             this.thumbnail = await this.$api.uploaders.getFiles(this.book?.imageId);
                         }
                     } catch (e) {

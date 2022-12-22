@@ -11,7 +11,7 @@
                 @keyup.native.enter="submit"
             >
                 <template #prefix>
-                    <i class="far fa-user text-prim-90" />
+                    <i class="far fa-user text-prim-900" />
                 </template>
             </a-input>
         </a-form-model-item>
@@ -22,7 +22,7 @@
                 @keyup.native.enter="submit"
             >
                 <template #prefix>
-                    <i class="fas fa-unlock-alt text-prim-90" />
+                    <i class="fas fa-unlock-alt text-prim-900" />
                 </template>
             </a-input-password>
         </a-form-model-item>

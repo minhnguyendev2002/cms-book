@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-col items-center">
-        <div slot="title" class="mt-4 mb-4 text-gray-80 text-xl font-medium text-prim-900 text-center">
-            Đăng nhập
+        <div slot="title" class="mt-4 mb-4 text-gray-80 text-4xl font-medium text-prim-900 text-center">
+            {{ isLogin ? 'Đăng nhập' : 'Đăng ký' }}
         </div>
         <div v-if="isLogin" class="w-full">
             <a-alert
@@ -39,7 +39,7 @@
                 ref="formRegister"
                 :loading="loading"
                 class="!mt-3 min-w-[200px] max-w-md w-full"
-                @submit="login"
+                @submit="register"
             />
             <a-button
                 :loading="loading"
@@ -47,8 +47,23 @@
                 class="w-full mt-10"
                 @click="$refs.formRegister.submit()"
             >
-                Đăng nhập
+                Đăng ký
             </a-button>
+        </div>
+
+        <div class="mt-7">
+            <div v-if="isLogin">
+                Bạn chưa có tài khoản ? <span
+                    class="font-bold cursor-pointer text-prim-900"
+                    @click="changeForm"
+                >Đăng ký</span>
+            </div>
+            <div v-else>
+                Bạn đã có tài khoản ? <span
+                    class="font-bold cursor-pointer text-prim-900"
+                    @click="changeForm"
+                >Đăng nhập</span>
+            </div>
         </div>
     </div>
 </template>
@@ -89,6 +104,21 @@
                 } finally {
                     this.loading = false;
                 }
+            },
+            async register(form) {
+                try {
+                    this.loading = true;
+                    await this.$api.auth.signUp(form);
+                    this.isLogin = true;
+                    this.$message.success('Đăng ký thành công');
+                } catch {
+                    this.$message.error('Thất bại');
+                } finally {
+                    this.loading = false;
+                }
+            },
+            changeForm() {
+                this.isLogin = !this.isLogin;
             },
         },
 

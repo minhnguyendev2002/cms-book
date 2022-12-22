@@ -1,127 +1,116 @@
 <template>
     <div>
         <a-table
-            :data-source="users"
             :loading="loading"
+            :data-source="users"
+            :scroll="{ x: 1000 }"
             :pagination="false"
+            :row-key="row => row.id"
         >
             <a-table-column
-                v-if="pagination"
                 key="index"
                 title="STT"
-                :width="60"
-                :custom-render="getIndex"
+                :width="50"
+                :custom-render="(text, record, index) => index + 1"
             />
             <a-table-column
-                key="fullName"
-                title="HỌ TÊN"
-                :width="200"
-                data-index="fullName"
-                class="font-semibold"
-            />
-            <a-table-column
-                key="userName"
-                title="USERNAME"
-                data-index="userName"
-                class="font-semibold"
-                :width="130"
-            />
-            <a-table-column
-                key="phone"
-                title="SĐT"
-                data-index="phone"
+                key="username"
+                title="Tên đăng nhập"
                 :width="150"
             >
-                <template #default="phone">
-                    {{ phone | phoneFormat }}
+                <template #default="record">
+                    {{ record.username || '--' }}
                 </template>
             </a-table-column>
             <a-table-column
                 key="email"
-                title="EMAIL"
-                data-index="email"
-                :width="220"
-            />
-            <a-table-column
-                key="groups"
-                title="GROUP"
-                data-index="groups"
-                :width="180"
-            >
-                <template #default="groups">
-                    {{ getGroupName(groups) || '-' }}
-                </template>
-            </a-table-column>
-            <a-table-column
-                key="status"
-                title="TRẠNG THÁI"
+                title="Email"
                 :width="120"
             >
-                <template #default="user">
-                    <a-switch :checked="!!user.status.id" @change="toggleStatus(user)" />
+                <template #default="record">
+                    {{ record.email || '--' }}
                 </template>
             </a-table-column>
             <a-table-column
-                key="actions"
-                align="right"
-                :width="80"
+                key="role"
+                title="Vai trò"
+                :width="100"
+                align="center"
             >
-                <template #default="_user">
-                    <button @click="openUserDialog(_user)">
-                        <i class="text-gray-80 fas fa-pen" />
-                    </button>
+                <template #default="record">
+                    {{ record.roles[0].name + ',  ' + (record.roles[1]?.name || '') }}
+                </template>
+            </a-table-column>
+
+            <a-table-column :width="60" align="right" fixed="right">
+                <template #default="scope">
+                    <a-dropdown :trigger="['click']">
+                        <a-button class="!mr-0" size="small">
+                            <i class="fas fa-ellipsis-h" />
+                        </a-button>
+                        <a-menu slot="overlay">
+                            <a-menu-item
+                                @click="() => {
+                                    $refs.ConfirmDialog.open(),
+                                    selectUser(scope)
+                                }"
+                            >
+                                <i class="w-4 mr-2 isax isax-edit-2" />
+                                Chuyển vai trò thành: {{ scope .roles[0].name === 'ROLE_ADMIN' ? "USER":"ADMIN" }}
+                            </a-menu-item>
+                        </a-menu>
+                    </a-dropdown>
                 </template>
             </a-table-column>
         </a-table>
-        <UserDialog ref="userDialog" />
+        <ConfirmDialog
+            ref="ConfirmDialog"
+            title="Xác nhận xóa"
+            content="Bạn chắc chắn thay đổi vai trò người dùng này chứ ?"
+            @confirm="updateUser"
+        />
     </div>
 </template>
 
 <script>
-    import _join from 'lodash/join';
-    import _map from 'lodash/map';
-    import UserDialog from '@/components/users/Dialog.vue';
+    import ConfirmDialog from '@/components/shared/ConfirmDialog.vue';
 
     export default {
         components: {
-            UserDialog,
+            ConfirmDialog,
         },
 
         props: {
             users: {
                 type: Array,
-                required: true,
+                required: false,
             },
             loading: {
                 type: Boolean,
                 default: false,
             },
-            pagination: {
-                type: Object,
-                required: false,
-            },
+        },
+
+        data() {
+            return {
+                user: null,
+            };
         },
 
         methods: {
-            getIndex(text, record, index) {
-                return (parseInt((+this.pagination.start + 1), 10) - 1) * this.pagination.length + index + 1;
+            selectUser(value) {
+                this.user = value;
             },
-
-            getGroupName(groups) {
-                return _join(_map(groups, 'description'), ', ');
-            },
-
-            openUserDialog(user) {
-                this.$refs.userDialog.open(user);
-            },
-
-            async toggleStatus(user) {
+            async updateUser() {
                 try {
-                    await this.$api.users.toggleStatus(user.userId);
-                    await this.$nuxt.refresh();
-                    this.$message.success('Cập nhật trạng thái user thành công');
-                } catch (error) {
-                    this.$handleError(error);
+                    await this.$api.users.update({
+                        username: this.user.username,
+                        role: this.user.roles[0].name === 'ROLE_ADMIN' ? 'ROLE_USER' : 'ROLE_ADMIN',
+                    });
+                    this.$message.success('Thành công');
+                    this.$nuxt.refresh();
+                } catch (e) {
+                    this.$handleError(e);
                 }
             },
         },
