@@ -96,34 +96,16 @@
             },
             menuItems() {
                 return [{
-                    label: 'Dashboard',
+                    label: 'Cửa hàng',
                     key: '/',
                     permission: ['admin'],
                     classIcon: 'isax isax-graph',
-                    childrens: [],
-                }, {
-                    label: 'Cửa hàng',
-                    key: '/books',
-                    permission: ['admin', 'user'],
-                    classIcon: 'isax isax-user',
                     childrens: [],
                 }, {
                     label: 'Giỏ hàng của tôi',
                     key: '/my-cart',
                     permission: ['user'],
                     classIcon: 'isax isax-shopping-cart',
-                    childrens: [],
-                }, {
-                    label: 'Đơn hàng của tôi',
-                    key: '/my-order',
-                    permission: ['user'],
-                    classIcon: 'isax isax-receipt-item',
-                    childrens: [],
-                }, {
-                    label: 'Đơn hàng',
-                    key: '/orders',
-                    permission: ['admin'],
-                    classIcon: 'isax isax-empty-wallet',
                     childrens: [],
                 }];
             },

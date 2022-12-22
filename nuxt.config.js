@@ -46,6 +46,7 @@ export default {
         '@/plugins/ant-design',
         '@/plugins/filters',
         '@/plugins/global-components',
+        '@/plugins/permission',
     ],
 
     robots: [
@@ -93,6 +94,9 @@ export default {
 
     axios: {
         baseURL: process.env.API_HOST,
+        headers: {
+            'Access-Control-Allow-Origin': '*',
+        },
     },
 
     auth: {
@@ -102,23 +106,21 @@ export default {
                     property: 'access_token',
                     global: true,
                     required: true,
-                    name: 'auth',
                     maxAge: 60 * 60 * 24 * 30,
-                    type: false,
                 },
                 autoLogout: false,
                 user: {
-                    property: 'data',
-                    autoFetch: false,
+                    property: false,
+                    autoFetch: true,
                 },
                 endpoints: {
                     login: {
                         url: '/login',
-                        method: 'post',
+                        method: 'POST',
                     },
                     user: {
                         url: '/auth/me',
-                        method: 'get',
+                        method: 'GET',
                     },
                 },
                 redirect: {

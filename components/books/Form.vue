@@ -29,7 +29,7 @@
                     />
                 </a-form-model-item>
             </div>
-            <div class="flex items-center flex-col gap-x-8">
+            <div v-if="!isCreate" class="flex items-center flex-col gap-x-8">
                 <a-upload
                     :show-upload-list="false"
                     action=""
@@ -43,8 +43,8 @@
                     </div>
                 </a-upload>
                 <img
-                    v-if="imageThumbnail"
-                    :src="imageThumbnail"
+                    v-if="imageThumbnail || form.thumbnail"
+                    :src="imageThumbnail ? imageThumbnail: 'data:image/jpeg;base64,' + form.thumbnail"
                     onerror="this.src='/images/default-avatar.png'"
                     alt=""
                     class="w-56 h-72 rounded object-cover"
@@ -53,32 +53,43 @@
                     <span>Chưa có ảnh</span>
                 </div>
             </div>
-            <a-form-model-item label="Ngày phát hành" prop="dateCreate">
-                <a-input
-                    v-model="form.dateCreate"
+            <a-form-model-item label="Ngày phát hành" prop="releaseDate">
+                <a-date-picker
+                    v-model="form.releaseDate"
+                    class="w-full"
                     :disabled="!isEdit"
-                    autocomplete="off"
+                    format="DD/MM/YYYY"
+                    value-format="YYYY-MM-DD"
+                    placeholder="Ngày phát hành"
                 />
             </a-form-model-item>
             <a-form-model-item label="Số trang" prop="countPage">
                 <a-input
-                    v-model.number="form.countPage"
+                    v-model.number="form.pageNumber"
                     :disabled="!isEdit"
                     autocomplete="off"
                 />
             </a-form-model-item>
-            <a-form-model-item label="Thể loại" prop="type">
+            <a-form-model-item label="Thể loại" prop="category">
+                <a-select
+                    v-model="form.category"
+                    placeholder="Thể loại"
+                >
+                    <a-select-option v-for="item in BOOK_TYPE_OPTIONS" :key="item.value" :value="item.label">
+                        {{ item.label }}
+                    </a-select-option>
+                </a-select>
+            </a-form-model-item>
+            <a-form-model-item label="Giá tiền" prop="cost">
                 <a-input
-                    v-model="form.type"
+                    v-model="form.cost"
                     :disabled="!isEdit"
-                    autocomplete="off"
                 />
             </a-form-model-item>
-            <a-form-model-item label="Giá tiền" prop="price">
+            <a-form-model-item label="Số lượng" prop="total">
                 <a-input
-                    v-model="form.price"
+                    v-model="form.total"
                     :disabled="!isEdit"
-                    autocomplete="off"
                 />
             </a-form-model-item>
         </div>
@@ -94,10 +105,11 @@
         title: '',
         description: '',
         author: '',
-        dateCreate: '',
-        countPage: '',
-        type: '',
-        price: '',
+        releaseDate: '',
+        pageNumber: '',
+        category: '',
+        cost: '',
+        total: '',
         thumbnail: '',
     };
 
@@ -107,11 +119,16 @@
                 type: Boolean,
                 default: true,
             },
+            isCreate: {
+                type: Boolean,
+                default: true,
+            },
             book: {
                 type: Object,
                 default: () => {},
             },
         },
+
         data() {
             return {
                 BOOK_TYPE,
@@ -122,11 +139,14 @@
                 rules: {
                     title: [{ required: true, message: 'Không được để trống trường này.', trigger: 'change' }],
                     author: [{ required: true, message: 'Không được để trống trường này.', trigger: 'change' }],
-                    dateCreate: [{ required: true, message: 'Không được để trống trường này.', trigger: 'change' }],
-                    countPage: [{ required: true, message: 'Không được để trống trường này.', trigger: 'change' },
-                                { validator: validNumberString, message: 'Vui lòng nhập đúng định dạng là số', trigger: 'change' }],
-                    type: [{ required: true, message: 'Không được để trống trường này.', trigger: 'change' }],
-                    price: [{ required: true, message: 'Không được để trống trường này.', trigger: 'change' }],
+                    releaseDate: [{ required: true, message: 'Không được để trống trường này.', trigger: 'change' }],
+                    pageNumber: [{ required: true, message: 'Không được để trống trường này.', trigger: 'change' },
+                                 { validator: validNumberString, message: 'Vui lòng nhập đúng định dạng là số', trigger: 'change' }],
+                    category: [{ required: true, message: 'Không được để trống trường này.', trigger: 'change' }],
+                    cost: [{ required: true, message: 'Không được để trống trường này.', trigger: 'change' },
+                           { validator: validNumberString, message: 'Vui lòng nhập đúng định dạng là số', trigger: 'change' }],
+                    total: [{ required: true, message: 'Không được để trống trường này.', trigger: 'change' },
+                            { validator: validNumberString, message: 'Vui lòng nhập đúng định dạng là số', trigger: 'change' }],
                 },
             };
         },
@@ -135,16 +155,17 @@
             imageThumbnail() {
                 this.form.thumbnail = this.imageThumbnail;
             },
+            book() {
+                this.form = this.book ? _cloneDeep(this.book) : _cloneDeep(defaultForm);
+                this.form.thumbnail = this.book.thumbnail;
+            },
         },
 
         methods: {
-            submitForm() {
-                this.$refs.form.validate((valid) => {
+            submit() {
+                this.$refs.form.validate(async (valid) => {
                     if (valid) {
-                        alert('submit!');
-                    } else {
-                        console.log('error submit!!');
-                        return false;
+                        this.$emit('submit', this.form, this.fileThumbnail);
                     }
                 });
             },
@@ -157,4 +178,4 @@
             },
         },
     };
-  </script>
+</script>

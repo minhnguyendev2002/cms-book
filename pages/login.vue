@@ -77,8 +77,11 @@
         methods: {
             async login(form) {
                 try {
+                    const params = new URLSearchParams();
+                    params.append('username', form.username);
+                    params.append('password', form.password);
                     this.loading = true;
-                    await this.$auth.loginWith('local', { data: JSON.stringify(form) });
+                    await this.$auth.loginWith('local', { data: params });
                     this.$router.push('/');
                     this.$message.success('Đăng nhập thành công');
                 } catch {

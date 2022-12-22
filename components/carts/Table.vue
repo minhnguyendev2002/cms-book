@@ -19,60 +19,48 @@
                 :custom-render="(text, record, index) => index + 1"
             />
             <a-table-column
-                key="thumbnail"
-                data-index="thumbnail"
-                title="Ảnh"
-                :width="140"
-                align="center"
-            >
-                <template #default="thumbnail">
-                    <img
-                        class="w-full h-[150px] rounded aspect-video object-cover"
-                        loading="lazy"
-                        :src="thumbnail"
-                        alt="/"
-                    >
-                </template>
-            </a-table-column>
-            <a-table-column
                 key="title"
                 title="Tiêu đề"
                 :width="150"
-                data-index="title"
-            />
+            >
+                <template #default="record">
+                    {{ record.book.title }}
+                </template>
+            </a-table-column>
             <a-table-column
                 key="author"
                 title="Tác giả"
                 :width="120"
-                data-index="author"
-            />
-            <a-table-column
-                key="price"
-                title="Đơn giá"
-                :width="100"
-                align="center"
-                data-index="price"
             >
-                <template #default="price">
-                    {{ price | currencyFormat }}
+                <template #default="record">
+                    {{ record.book.author || '--' }}
                 </template>
             </a-table-column>
             <a-table-column
-                key="count"
+                key="cost"
+                title="Đơn giá"
+                :width="100"
+                align="center"
+            >
+                <template #default="record">
+                    {{ record.book.cost | currencyFormat }}
+                </template>
+            </a-table-column>
+            <a-table-column
+                key="amount"
                 title="Số lượng"
                 :width="80"
-                data-index="count"
+                data-index="amount"
                 align="center"
             />
             <a-table-column
                 key="sumPrice"
                 title="Thành tiền"
                 :width="100"
-                data-index="sumPrice"
                 align="center"
             >
-                <template #default="sumPrice">
-                    {{ sumPrice | currencyFormat }}
+                <template #default="record">
+                    {{ (+record.book.cost * +record.amount) | currencyFormat }}
                 </template>
             </a-table-column>
             <a-table-column :width="60" align="right" fixed="right">
@@ -82,7 +70,7 @@
                             <i class="fas fa-ellipsis-h" />
                         </a-button>
                         <a-menu slot="overlay">
-                            <a-menu-item @click="$refs.BookDialog.open(scope, true)">
+                            <a-menu-item @click="$refs.BookDialog.open(scope.book, false)">
                                 <i class="w-4 mr-2 isax isax-edit-2" />
                                 Xem chi tiết
                             </a-menu-item>
@@ -112,10 +100,6 @@
         components: {
             BookDialog,
             ConfirmDialog,
-        },
-
-        model: {
-            prop: 'value',
         },
 
         props: {

@@ -9,29 +9,48 @@
                 <div class="my-4 bg-white shadow-light px-3 py-2 rounded-md w-96">
                     <div class="flex items-center justify-between">
                         <div class="font-medium">
-                            Đơn hàng đã chọn: {{ bookSelected.length | numberFormat || 0 }}
+                            Đơn hàng đã chọn: {{ bookSelected.length | numberFormat }}
                         </div>
                         <a-button
                             type="primary"
                             :disabled="!isEnabelOrder"
-                            @click="orderCart"
+                            @click="$refs.ConfirmDialog.open()"
                         >
                             <i class="fas fa-check" /> Đồng ý đặt hàng
                         </a-button>
                     </div>
                 </div>
             </transition>
-            <CartTable :books="books" @selected="selectedBook" />
+            <CartTable :books="carts" @selected="selectedBook" />
         </div>
+
+        <ConfirmDialog ref="ConfirmDialog">
+            <section class="relative pt-10 pb-20">
+                <div class="w-full">
+                    <div class="mx-auto">
+                        <img src="/images/update.jpg" alt="/" class="w-full h-auto mx-auto rounded-md"> <h4 class="mt-4 text-center text-xl">
+                            Tính năng đang nghiên cứu phát triển
+                        </h4>
+                    </div>
+                </div>
+            </section>
+        </ConfirmDialog>
     </div>
 </template>
 
 <script>
+    import { mapState } from 'vuex';
     import CartTable from '@/components/carts/Table.vue';
+    import ConfirmDialog from '@/components/shared/ConfirmDialog.vue';
 
     export default {
         components: {
             CartTable,
+            ConfirmDialog,
+        },
+
+        async fetch() {
+            await this.fetchCart();
         },
 
         data() {
@@ -70,15 +89,21 @@
         },
 
         computed: {
+            ...mapState('carts', ['carts']),
             isEnabelOrder() {
                 return this.bookSelected.length > 0;
             },
         },
 
         methods: {
-            orderCart() {
-                console.log(1);
+            async fetchCart() {
+                try {
+                    await this.$store.dispatch('carts/fetchAll');
+                } catch (e) {
+                    this.$handleError(e);
+                }
             },
+
             selectedBook(selectedBookIds, selectedBooks) {
                 this.bookSelected = selectedBooks;
             },

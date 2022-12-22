@@ -2,12 +2,17 @@
     <div class="bg-white rounded-[15px] p-5 ">
         <div class="grid grid-cols-2 gap-5">
             <div class="">
-                <img class="rounded" src="https://images.unsplash.com/photo-1519501025264-65ba15a82390?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8M3x8fGVufDB8fHx8&w=1000&q=80" alt="/">
+                <img
+                    class="rounded"
+                    :src="'data:image/jpeg;base64,' + thumbnail"
+                    ratio="1"
+                    alt="/"
+                >
             </div>
             <div class="mt-auto mb-3">
-                <h2>Sách này rất là ngon</h2>
+                <h2>{{ book.title || 'Sách của Tú' }}</h2>
                 <h4>Mô tả:</h4>
-                <p>Mình cần một bạn giải bài tập về vmware và quay video lại trong ngày. Giá cả thương lượng</p>
+                <p>{{ book.description || 'Đây là sách vipro' }}</p>
             </div>
         </div>
         <div class="flex justify-between items-center mt-5">
@@ -19,21 +24,21 @@
                 >
                 <div>
                     <h3 class="mb-0">
-                        Mikuda hyu
+                        {{ book.author || 'Vũ Ngọc Tú' }}
                     </h3>
                     <p class="mb-0">
-                        Content creater
+                        Tác giả
                     </p>
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <a-button type="primary" class="!rounded-full !h-12 !w-12" @click="$refs.BookDialog.open({})">
+                <a-button type="primary" class="!rounded-full !h-12 !w-12" @click="$refs.BookDialog.open(book, true, false, thumbnail)">
                     <i class="fas fa-pen" />
                 </a-button>
-                <a-button type="primary" class="!rounded-full !h-12 !w-12" @click="$refs.BookDialog.open({}, false)">
+                <a-button type="primary" class="!rounded-full !h-12 !w-12" @click="$refs.BookDialog.open(book, false, false, thumbnail)">
                     <i class="fas fa-eye" />
                 </a-button>
-                <a-button type="primary" class="!rounded-full !h-12 !w-12" @click="$refs.AddCartDiaLog.open()">
+                <a-button type="primary" class="!rounded-full !h-12 !w-12" @click="$refs.AddCartDiaLog.open(book)">
                     <i class="fas fa-shopping-cart" />
                 </a-button>
             </div>
@@ -51,6 +56,34 @@
         components: {
             BookDialog,
             AddCartDiaLog,
+        },
+        props: {
+            book: {
+                type: Object,
+                default: () => {},
+            },
+        },
+
+        async fetch() {
+            await this.getImage();
+        },
+
+        data() {
+            return {
+                thumbnail: null,
+            };
+        },
+
+        methods: {
+            async getImage() {
+                if (this.book?.imageId) {
+                    try {
+                        this.thumbnail = await this.$api.uploaders.getFiles(this.book?.imageId);
+                    } catch (e) {
+                        this.$handleError(e);
+                    }
+                }
+            },
         },
     };
 </script>

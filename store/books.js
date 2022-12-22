@@ -14,7 +14,8 @@ export const mutations = {
 
 export const actions = {
     async fetchAll({ commit }, payload) {
-        const { data: { content } } = await this.$api.books.getAll(payload);
+        const { content } = await this.$api.books.getAll(payload);
+        console.log(content);
         commit('SET_STATE', { prop: 'books', data: content });
     },
     async fetchDetail({ commit }, id) {

@@ -9,39 +9,52 @@
     >
         <div class="grid grid-cols-12 gap-6">
             <div class="col-span-3">
-                <img class="rounded" src="https://images.unsplash.com/photo-1519501025264-65ba15a82390?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8M3x8fGVufDB8fHx8&w=1000&q=80" alt="sdasd">
+                <img
+                    class="rounded"
+                    :src="'data:image/jpeg;base64,' + thumbnail"
+                    alt="sdasd"
+                >
             </div>
             <div class="col-span-9 flex flex-col">
                 <div>
                     <h2 class="text-3xl">
-                        Đây là sách vip
+                        {{ book?.title || '' }}
                     </h2>
                     <p class="text-lg">
-                        sách cực vip dành cho giới trẻ
+                        {{ book?.description || '' }}
                     </p>
                 </div>
                 <div class="flex justify-between items-center mt-auto">
                     <div class="flex flex-col gap-3">
-                        <span class="text-lg"><strong>Còn lại</strong>: 20</span>
-                        <span class="text-lg"><strong>Đơn giá</strong>: 1500.000đ</span>
+                        <span class="text-lg"><strong>Đơn giá</strong>: {{ book?.cost | currencyFormat }}</span>
+                        <span class="text-lg"><strong>Còn lại</strong>: {{ book?.total || '0' }}</span>
                     </div>
-                    <div>
-                        <a-form-model
-                            ref="ruleForm"
-                            :model="ruleForm"
-                            :rules="rules"
+                    <div class="flex items-center justify-between w-[104px] sm:w-28">
+                        <button
+                            class="w-8 h-8 rounded-full flex items-center justify-center border border-neutral-400 bg-white focus:outline-none hover:border-neutral-700
+                                        disabled:hover:border-neutral-400 disabled:opacity-50 disabled:cursor-default"
+                            type="button"
+                            :disabled="amount <= 1"
+                            @click="changeAmount(-1)"
                         >
-                            <a-form-model-item label="Số lượng" prop="checkPass">
-                                <a-input placeholder="Nhập số lượng" />
-                            </a-form-model-item>
-                            <a-form-model />
-                        </a-form-model>
+                            <i class="text-3xl isax isax-minus" />
+                        </button>
+                        <span class="select-none block flex-1 text-center leading-none">{{ amount }}</span>
+                        <button
+                            class="w-8 h-8 rounded-full flex items-center justify-center border border-neutral-400 bg-white focus:outline-none hover:border-neutral-700
+                                        disabled:hover:border-neutral-400 disabled:opacity-50 disabled:cursor-default"
+                            type="button"
+                            :disabled="amount >= book?.total"
+                            @click="changeAmount(1)"
+                        >
+                            <i class="text-3xl isax isax-add" />
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
         <div class="mt-10 flex items-center justify-end gap-3">
-            <a-button type="primary" class="!w-32">
+            <a-button type="primary" class="!w-32" @click="createCart">
                 Thêm giỏ hàng
             </a-button>
         </div>
@@ -51,44 +64,25 @@
 <script>
     import _get from 'lodash/get';
 
-    const defaultUser = {
-        address: 'VietNam',
-        avatar: null,
-        code: '0000090',
-        dateOfBirth: '2022-08-10T00:00:00.000Z',
-        email: 'tester@gmail.com',
-        fullName: 'Tester huong',
-        gender: 'female',
-        id: 90,
-        phoneNumber: '0987654321',
-    };
     export default {
         components: {
         },
         data() {
             return {
                 visible: false,
-                user: defaultUser,
+                book: null,
+                thumbnail: null,
+                amount: 1,
                 fetchLoading: false,
-                ruleForm: {
-                    pass: '',
-                    checkPass: '',
-                    age: '',
-                },
-                rules: {
-                    pass: [{ trigger: 'change' }],
-                    checkPass: [{ trigger: 'change' }],
-                    age: [{ trigger: 'change' }],
-                },
             };
         },
 
         methods: {
             _get,
 
-            async open() {
+            async open(book) {
                 this.visible = true;
-                // await this.fetchData(user);
+                await this.fetchBook(book);
             },
 
             close() {
@@ -97,6 +91,34 @@
 
             empty() {
                 this.user = {};
+            },
+
+            changeAmount(n) {
+                this.amount += n;
+            },
+
+            async createCart() {
+                try {
+                    this.book = await this.$api.carts.create({ bookId: this.book?.id, amount: this.amount });
+                    this.$message.success('Thành công');
+                    this.close();
+                    this.$nuxt.refresh();
+                } catch (e) {
+                    this.$handleError(e);
+                }
+            },
+
+            async fetchBook(book) {
+                if (book) {
+                    try {
+                        this.book = await this.$api.books.getDetail(book?.id);
+                        if (book?.imageId) {
+                            this.thumbnail = await this.$api.uploaders.getFiles(this.book?.imageId);
+                        }
+                    } catch (e) {
+                        this.$handleError(e);
+                    }
+                }
             },
         },
     };
