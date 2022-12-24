@@ -46,21 +46,36 @@
                 <a-button type="primary" class="!rounded-full !h-12 !w-12" @click="$refs.AddCartDiaLog.open(book)">
                     <i class="fas fa-shopping-cart" />
                 </a-button>
+                <a-button
+                    v-if="$isAdmin()"
+                    type="danger"
+                    class="!rounded-full !h-12 !w-12"
+                    @click="$refs.ConfirmDialog.open()"
+                >
+                    <i class="fas fa-trash" />
+                </a-button>
             </div>
         </div>
         <AddCartDiaLog ref="AddCartDiaLog" />
         <BookDialog ref="BookDialog" />
+        <ConfirmDialog
+            ref="ConfirmDialog"
+            content="Bạn chắc chắn xóa quyển sách này chứ"
+            @confirm="deleteBook"
+        />
     </div>
 </template>
 
 <script>
     import AddCartDiaLog from '@/components/carts/AddCart.vue';
     import BookDialog from '@/components/books/Dialog.vue';
+    import ConfirmDialog from '@/components/shared/ConfirmDialog.vue';
 
     export default {
         components: {
             BookDialog,
             AddCartDiaLog,
+            ConfirmDialog,
         },
         props: {
             book: {
@@ -87,6 +102,15 @@
                     } catch (e) {
                         this.$handleError(e);
                     }
+                }
+            },
+            async deleteBook() {
+                try {
+                    this.thumbnail = await this.$api.books.delete(this.book?.id);
+                    this.$nuxt.refresh();
+                    this.$message.success('Xóa thành công');
+                } catch (e) {
+                    this.$handleError(e);
                 }
             },
         },
