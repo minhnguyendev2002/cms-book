@@ -37,8 +37,7 @@
                     :disabled="!isEdit"
                     accept="image/png, image/jpeg"
                 >
-                    <div class="flex gap-x-2">
-                        <img src="/images/upload.svg" alt="avatar">
+                    <div>
                         {{ $isAdmin() || !isEdit ? "Tải ảnh lên" : "" }}
                     </div>
                 </a-upload>
@@ -53,16 +52,18 @@
                     <span>Chưa có ảnh</span>
                 </div>
             </div>
-            <a-form-model-item label="Ngày phát hành" class="mt-auto" prop="releaseDate">
-                <a-date-picker
-                    v-model="form.releaseDate"
-                    class="w-full"
-                    :disabled="!isEdit"
-                    format="DD/MM/YYYY"
-                    value-format="YYYY-MM-DD"
-                    placeholder="Ngày phát hành"
-                />
-            </a-form-model-item>
+            <div class="flex flex-col">
+                <a-form-model-item label="Ngày phát hành" class="!mt-auto" prop="releaseDate">
+                    <a-date-picker
+                        v-model="form.releaseDate"
+                        class="w-full"
+                        :disabled="!isEdit"
+                        format="DD/MM/YYYY"
+                        value-format="YYYY-MM-DD"
+                        placeholder="Ngày phát hành"
+                    />
+                </a-form-model-item>
+            </div>
             <a-form-model-item label="Số trang" prop="countPage">
                 <a-input
                     v-model.number="form.pageNumber"
