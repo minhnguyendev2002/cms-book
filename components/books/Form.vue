@@ -29,12 +29,12 @@
                     />
                 </a-form-model-item>
             </div>
-            <div v-if="!isCreate" class="flex items-center flex-col gap-x-8">
+            <div class="flex items-center flex-col gap-x-8">
                 <a-upload
                     :show-upload-list="false"
                     action=""
                     :transform-file="handlerThumbnail"
-                    :disabled="!isEdit"
+                    :disabled="isCreate"
                     accept="image/png, image/jpeg"
                 >
                     <div>
