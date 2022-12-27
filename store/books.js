@@ -1,6 +1,6 @@
 export const state = () => ({
     books: [],
-    book: {},
+    pagination: {},
 });
 
 export const getters = {
@@ -14,9 +14,18 @@ export const mutations = {
 
 export const actions = {
     async fetchAll({ commit }, payload) {
-        const { content } = await this.$api.books.getAll(payload);
-        console.log(content);
+        const {
+            content, number, totalElements, size,
+        } = await this.$api.books.getAll(payload);
         commit('SET_STATE', { prop: 'books', data: content });
+        commit('SET_STATE', {
+            prop: 'pagination',
+            data: {
+                page: number + 1,
+                total: totalElements,
+                perPage: size,
+            },
+        });
     },
     async fetchDetail({ commit }, id) {
         const { data } = await this.$api.books.getDetail(id);

@@ -10,7 +10,7 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-12 gap-5 mt-6">
+        <div class="grid grid-cols-12 gap-5 mt-6 mb-8">
             <CardBook
                 v-for="book in books"
                 :key="book.id"
@@ -18,6 +18,7 @@
                 class="col-span-12 lg:col-span-6 2xl:col-span-4"
             />
         </div>
+        <ct-pagination :data="pagination" />
 
         <AddBookDialog ref="AddBookDialog" />
     </div>
@@ -39,7 +40,7 @@
         },
 
         computed: {
-            ...mapState('books', ['books']),
+            ...mapState('books', ['books', 'pagination']),
         },
 
         methods: {
